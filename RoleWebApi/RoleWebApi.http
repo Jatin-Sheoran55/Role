@@ -1,0 +1,6 @@
+@RoleWebApi_HostAddress = http://localhost:5229
+
+GET {{RoleWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
