@@ -1,4 +1,5 @@
-﻿using Application.Roles.DTO;
+﻿using Application.Employees.Dto;
+using Application.Roles.DTO;
 using AuthWebApp.Service.UserLogins.Dto;
 using Data.Employees;
 using Data.Roles;
@@ -61,6 +62,27 @@ public class EmployeeApplication : IEmployeeApplication
             Role = role.Name
 
         };
+    }
+
+    public async Task<bool> ChangePasswordAsync(int id, ChangePasswordDto dto)
+    {
+        var employee = await _employeeRepository.GetByIdAndPassword(id, dto.OldPassword);
+         
+
+        if (employee == null)
+        {
+            throw new Exception("Employee Not Found !");
+        }
+
+
+
+        employee.PasswordHash = dto.NewPassword;
+             
+
+        await _employeeRepository.UpdateEmployee(employee);
+
+        return true;
+       
     }
 
 }

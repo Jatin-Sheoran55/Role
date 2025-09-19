@@ -19,6 +19,11 @@ public class EmployeeRepository : IEmployeeRepository
         return employee;
     }
 
+    public async Task UpdateEmployee(Employee input)
+    {
+        _context.Employees.Update(input);
+        await _context.SaveChangesAsync();
+    }
     public async Task<Employee?> GetByEmail(string email)
     {
 
@@ -34,5 +39,14 @@ public class EmployeeRepository : IEmployeeRepository
         && x.PasswordHash == password);
 
     }
+
+    public async Task<Employee?>  GetByIdAndPassword(int id, string password)
+    {
+        return await _context.Employees
+         .FirstOrDefaultAsync(x => x.Id == id && x.PasswordHash == password);
+
+    }
+
+
 }
 

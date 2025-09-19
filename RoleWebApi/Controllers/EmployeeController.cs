@@ -1,5 +1,8 @@
-﻿using Application.Roles.DTO;
+﻿using Application.Employees.Dto;
+using Application.Roles.DTO;
 using AuthWebApp.Service.UserLogins.Dto;
+using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -77,5 +80,28 @@ public class EmployeeController : ControllerBase
 
     }
 
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto input)
+    {
+
+        try
+        { 
+
+            var user = HttpContext.User;
+
+            var userid = user.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? user.FindFirstValue("Sub");
+                 
+            await _employee.ChangePasswordAsync(Convert.ToInt32( userid),input);
+
+            return Ok("Passsword Changed ");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+    }    
 }
 

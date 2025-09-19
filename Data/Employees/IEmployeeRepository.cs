@@ -9,6 +9,10 @@ public interface IEmployeeRepository
 
     Task<Employee?> GetByEmail(string email);
 
+    Task<Employee?> GetByIdAndPassword(int id, string password );
+
+    Task UpdateEmployee(Employee input);
+
     Task<Employee?> LoginAsync(string email, string password);
 
 }
