@@ -11,7 +11,7 @@ public class RoleRepository : IRoleRepository
     public RoleRepository(ProjectContext context)
     {
         _context = context;
-    } 
+    }
 
 
     public async Task<Role> CreateRole(Role role)

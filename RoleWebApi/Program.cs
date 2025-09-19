@@ -1,18 +1,15 @@
-using System.Text;
-using Application.Auth_Serv;
-using Application.Blog_Serv;
-using Application.Employee_Serv;
+using Application.Blogs;
+using Application.Employees;
 using Application.Roles;
 using Data;
-using Data.Auth_Repo;
-using Data.Blog_Repo;
-using Data.Employees_Repo;
+using Data.Blogs;
+using Data.Employees;
 using Data.Roles;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RoleWebApi.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +28,6 @@ builder.Services.AddScoped<IEmployeeApplication, EmployeeApplication>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IBlogApplication, BlogApplication>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped<IAuthApplication, AuthApplication>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(option =>
