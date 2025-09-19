@@ -1,4 +1,5 @@
 ﻿using Application.Roles.DTO;
+using AuthWebApp.Service.UserLogins.Dto;
 using Data.Employees;
 using Domain;
 
@@ -13,18 +14,27 @@ public class EmployeeApplication : IEmployeeApplication
         _employeeRepository = employeeRepository;
     }
 
-    public async Task<EmployeeDto> CreateEmployee(CreateUpdateEmployeeDto input)
+    public async Task<EmployeeDto> CreateEmployee(CreateEmployeeDto input)
     {
+        var checkEmployee= await _employeeRepository.GetByEmail(input.Email);
+
+        if(checkEmployee != null)
+        {
+            throw new Exception("Email Id already Exists");       
+        }
+
         var employee = new Employee();
         employee.Name = input.Name;
         employee.Email = input.Email;
-        employee.IsEnabled = input.IsEnabled;
-        employee.PasswordHash = input.PasswordHash;
-        employee.UpdatedDate = DateTime.Now;
+        employee.IsEnabled = true;
+        employee.PasswordHash = input.Password; 
         employee.CreatedDate = DateTime.Now;
-        employee.RoleId = input.RoleId;
+        employee.RoleId = 2;
+
         var result = await _employeeRepository.CreateEmployee(employee);
+        
         var employeeDto = new EmployeeDto();
+        
         employeeDto.Id = result.Id;
 
         return employeeDto;
@@ -69,4 +79,22 @@ public class EmployeeApplication : IEmployeeApplication
         };
         return data;
     }
+
+    public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
+    {
+        var user = await _employeeRepository.LoginAsync(dto.UserNameOrEmail, dto.Password);
+        if (user == null)
+            throw new Exception("Invalid username/email or password");
+
+
+
+        return new LoginResponseDto
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+
+        };
+    }
+
 }

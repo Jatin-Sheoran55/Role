@@ -35,4 +35,16 @@ public class EmployeeRepository : IEmployeeRepository
     {
         return await _context.Employees.FindAsync(id);
     }
+    public async Task<Employee> GetByEmail(string  email)
+    {
+        return await _context.Employees.FirstOrDefaultAsync(x => x.Email == email);
+    }
+    public async Task<UserLogin?> LoginAsync(string userNameOrEmail, string password)
+    {
+        return await _context.UserLogins
+            .FirstOrDefaultAsync(x => (x.UserName == userNameOrEmail || x.Email == userNameOrEmail)
+        && x.Password == password);
+
+    }
+
 }

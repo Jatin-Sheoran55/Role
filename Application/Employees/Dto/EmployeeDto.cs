@@ -6,7 +6,7 @@ public class EmployeeDto
     public string Name { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }
-    public string IsEnabled { get; set; }
+    public bool IsEnabled { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }
