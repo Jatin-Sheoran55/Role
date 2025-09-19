@@ -22,7 +22,6 @@ builder.Services.AddOpenApi();
 var connection = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<ProjectContext>(option => option.UseSqlServer(connection));
 
-builder.Services.AddTransient<IRoleApplication, RoleApplication>();
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IEmployeeApplication, EmployeeApplication>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();

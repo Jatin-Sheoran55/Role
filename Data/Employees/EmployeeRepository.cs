@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Data.Employees;
 
 public class EmployeeRepository : IEmployeeRepository
-
 {
     private readonly ProjectContext _context;
 
@@ -20,31 +19,20 @@ public class EmployeeRepository : IEmployeeRepository
         return employee;
     }
 
-    public async Task DeleteEmployee(int id)
+    public async Task<Employee?> GetByEmail(string email)
     {
-        var employee = await _context.Employees.FindAsync(id);
-        _context.Employees.Remove(employee);
+
+        return await _context.Employees
+            .FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<List<Employee>> GetAllEmployee()
-    {
-        return await _context.Employees.ToListAsync();
-    }
 
-    public async Task<Employee> GetById(int id)
-    {
-        return await _context.Employees.FindAsync(id);
-    }
-    public async Task<Employee> GetByEmail(string  email)
-    {
-        return await _context.Employees.FirstOrDefaultAsync(x => x.Email == email);
-    }
-    public async Task<Employee?> LoginAsync(string userNameOrEmail, string password)
+    public async Task<Employee?> LoginAsync(string email, string password)
     {
         return await _context.Employees
-            .FirstOrDefaultAsync(x => (x.Email == userNameOrEmail)
+            .FirstOrDefaultAsync(x => x.Email == email
         && x.PasswordHash == password);
 
     }
-
 }
+

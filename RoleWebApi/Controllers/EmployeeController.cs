@@ -1,5 +1,4 @@
-﻿using Application.Employees;
-using Application.Roles.DTO;
+﻿using Application.Roles.DTO;
 using AuthWebApp.Service.UserLogins.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -16,12 +15,12 @@ public class EmployeeController : ControllerBase
 {
     private readonly IEmployeeApplication _employee;
     private readonly IConfiguration _configuration;
-
+     
     public EmployeeController(IEmployeeApplication employee, IConfiguration configuration)
     {
         _employee = employee;
         _configuration = configuration;
-    }
+     }
 
     [HttpPost]
     public async Task<IActionResult> Post(CreateEmployeeDto input)
@@ -29,13 +28,13 @@ public class EmployeeController : ControllerBase
         try
         {
 
-            var data = await _employee.CreateEmployee(input);
-            return Ok( data.Id);
+            var id = await _employee.CreateEmployee(input);
+            return Ok(id);
 
-        } 
-        catch( Exception ex)
+        }
+        catch (Exception ex)
         {
-          return  BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
@@ -53,8 +52,7 @@ public class EmployeeController : ControllerBase
             var claims = new[]
             {
                     new  Claim(JwtRegisteredClaimNames.Sub , response.Id.ToString() ),
-                    new  Claim(ClaimTypes.Role, response.Role),
-                   // new  Claim(JwtRegisteredClaimNames.Jti ,"2232323232"),
+                    new  Claim(ClaimTypes.Role, response.Role), 
                     new Claim("other","other")
                  };
 
@@ -67,6 +65,9 @@ public class EmployeeController : ControllerBase
       );
 
             response.Token = new JwtSecurityTokenHandler().WriteToken(token);
+
+
+
             return Ok(new { message = "Login successful", data = response });
         }
         catch (Exception ex)
@@ -76,30 +77,5 @@ public class EmployeeController : ControllerBase
 
     }
 
-    [HttpGet]
-    public async Task<List<EmployeeDto>> GetAll()
-    {
-        return await _employee.GetAllEmployees();
-    }
-    [HttpGet("{id}")]
-
-    public async Task<EmployeeDto> Get(int id)
-    {
-        return await _employee.GetById(id);
-    }
-
-    [HttpPut("{id}")]
-    public async Task Put(int id, CreateEmployeeDto input)
-    {
-        await _employee.GetById(id);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task Delete(int id)
-    {
-        await _employee.DeleteEmployee(id);
-    }
-
-
-
 }
+

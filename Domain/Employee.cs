@@ -11,7 +11,7 @@ public class Employee
     public string Name { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; set; } = true;
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
 
