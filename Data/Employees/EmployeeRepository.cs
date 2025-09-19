@@ -39,11 +39,11 @@ public class EmployeeRepository : IEmployeeRepository
     {
         return await _context.Employees.FirstOrDefaultAsync(x => x.Email == email);
     }
-    public async Task<UserLogin?> LoginAsync(string userNameOrEmail, string password)
+    public async Task<Employee?> LoginAsync(string userNameOrEmail, string password)
     {
-        return await _context.UserLogins
-            .FirstOrDefaultAsync(x => (x.UserName == userNameOrEmail || x.Email == userNameOrEmail)
-        && x.Password == password);
+        return await _context.Employees
+            .FirstOrDefaultAsync(x => (x.Email == userNameOrEmail)
+        && x.PasswordHash == password);
 
     }
 

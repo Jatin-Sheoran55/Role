@@ -1,6 +1,7 @@
 ﻿using Application.Roles.DTO;
 using AuthWebApp.Service.UserLogins.Dto;
 using Data.Employees;
+using Data.Roles;
 using Domain;
 
 namespace Application.Employees;
@@ -8,10 +9,13 @@ namespace Application.Employees;
 public class EmployeeApplication : IEmployeeApplication
 {
     private readonly IEmployeeRepository _employeeRepository;
+    private readonly IRoleRepository _roleRepository;
 
-    public EmployeeApplication(IEmployeeRepository employeeRepository)
+    public EmployeeApplication(IEmployeeRepository employeeRepository,
+        IRoleRepository roleRepository)
     {
         _employeeRepository = employeeRepository;
+        _roleRepository = roleRepository;
     }
 
     public async Task<EmployeeDto> CreateEmployee(CreateEmployeeDto input)
@@ -83,16 +87,18 @@ public class EmployeeApplication : IEmployeeApplication
     public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
     {
         var user = await _employeeRepository.LoginAsync(dto.UserNameOrEmail, dto.Password);
+       
         if (user == null)
             throw new Exception("Invalid username/email or password");
 
-
+        var role = await _roleRepository.GetById(user.RoleId);
 
         return new LoginResponseDto
         {
             Id = user.Id,
-            UserName = user.UserName,
+            UserName = user.Name,
             Email = user.Email,
+            Role = role.Name ?? "User"
 
         };
     }

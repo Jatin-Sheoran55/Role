@@ -10,5 +10,5 @@ public interface IEmployeeRepository
     Task<List<Employee>> GetAllEmployee();
     Task DeleteEmployee(int id);
 
-    Task<UserLogin?> LoginAsync(string userNameOrEmail, string password);
+    Task<Employee?> LoginAsync(string userNameOrEmail, string password);
 }

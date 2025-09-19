@@ -1,5 +1,6 @@
 ﻿using Application.Employees;
 using Application.Roles.DTO;
+using AuthWebApp.Service.UserLogins.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -14,10 +15,12 @@ namespace RoleWebApi.Controllers;
 public class EmployeeController : ControllerBase
 {
     private readonly IEmployeeApplication _employee;
+    private readonly IConfiguration _configuration;
 
-    public EmployeeController(IEmployeeApplication employee)
+    public EmployeeController(IEmployeeApplication employee, IConfiguration configuration)
     {
         _employee = employee;
+        _configuration = configuration;
     }
 
     [HttpPost]
@@ -37,11 +40,11 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> EmployeeLogin(CreateEmployeeDto input)
+    public async Task<IActionResult> EmployeeLogin(LoginDto input)
     {
         try
         {
-            var response = await _userLoginService.LoginAsync(dto);
+            var response = await _employee.LoginAsync(input);
 
             var jwtSetting = _configuration.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSetting["key"]));
@@ -50,7 +53,7 @@ public class EmployeeController : ControllerBase
             var claims = new[]
             {
                     new  Claim(JwtRegisteredClaimNames.Sub , response.Id.ToString() ),
-                    new  Claim(ClaimTypes.Role, "Admin"),
+                    new  Claim(ClaimTypes.Role, response.Role),
                    // new  Claim(JwtRegisteredClaimNames.Jti ,"2232323232"),
                     new Claim("other","other")
                  };
