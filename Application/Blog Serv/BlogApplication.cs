@@ -62,7 +62,7 @@ namespace Application.Blog_Serv
                 Id = result.Id,
                 Title = result.Title,
                 Description = result.Description,
-                UpdatedDate = result.UpdatedDate,
+                UpdatedDate  = result.UpdatedDate,
                 CreatedDate = result.CreatedDate,
 
             };

@@ -25,23 +25,7 @@ namespace RoleWebApi.Controllers
             _emailService = emailService;
         }
 
-        [HttpPost("Send-mail")]
-
-        public async Task<IActionResult> SendMail(string to)
-        {
-            try
-            {
-                var subject = "Jatin Sheoran is Here";
-                var body = "How are you   <b>Jatin Sheoran<b>";
-
-                await _emailService.SendEmailAsync(to, subject, body);
-                return Ok("Mail Sended");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+    
 
         [HttpPost("Register")]
 

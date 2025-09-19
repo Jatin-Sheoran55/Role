@@ -20,14 +20,24 @@ namespace Application.Employee_Serv
 
         public async Task<EmployeeDto> CreateEmployee(CreateUpdateEmployeeDto input)
         {
+            var email = await _employeeRepository.GetByEmail(input.Email);
+                if (email == null)
+            {
+                throw new Exception("Email id is All Ready Exixted");
+            }
+               
+
+            
+          
+
             var employee = new Employee();
             employee.Name = input.Name;
             employee.Email = input.Email;
             employee.IsEnabled = input.IsEnabled;
             employee.PasswordHash = input.PasswordHash;
-            employee.UpdatedDate = DateTime.Now;
+          
             employee.CreatedDate = DateTime.Now;
-            employee.RoleId = input.RoleId;
+            employee.RoleId = 3;
             var result = await _employeeRepository.CreateEmployee(employee);
             var employeeDto = new EmployeeDto();
             employeeDto.Id = result.Id;
@@ -73,6 +83,40 @@ namespace Application.Employee_Serv
 
             };
             return data;
+        }
+
+        public async Task<EmployeeDto> GetByIEmail(string email)
+        {
+            var result = await _employeeRepository.GetByEmail(email);
+            var data = new EmployeeDto()
+            {
+                Id = result.Id,
+                Email = result.Email,
+            };
+            return data;
+        }
+
+        public async Task<LoginDto> LoginAsync(LoginDto dto)
+        {
+            var user = await _employeeRepository.LoginAsync(dto.UserName, dto.Password);
+            if (user == null)
+            {
+                user = new LoginResponseDto
+                {
+                    UserName = user.UserName,
+                    Password = user.Password,
+                };
+            }
+        }
+
+        public Task<EmployeeDto> RegisterAsync(CreateUpdateEmployeeDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<LoginResponseDto> IEmployeeApplication.LoginAsync(LoginDto dto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

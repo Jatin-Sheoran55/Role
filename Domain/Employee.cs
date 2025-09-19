@@ -17,8 +17,10 @@ namespace Domain
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string IsEnabled     { get; set; }
+        public string Password {  get; set; }
+        public string UserName { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         [ForeignKey("RoleId")]
         public int RoleId { get; set; }

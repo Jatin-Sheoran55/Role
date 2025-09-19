@@ -13,5 +13,7 @@ namespace Data.Employees_Repo
         Task<Employee> GetById(int id);
         Task<List<Employee>> GetAllEmployee();
         Task DeleteEmployee(int  id);
+        Task<Employee> GetByEmail(string email);
+        Task LoginAsync(string userName, string password);
     }
 }

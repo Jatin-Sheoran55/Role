@@ -23,5 +23,9 @@ namespace Data
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Auth> Auths { get; set; }
 
-}
+        internal async Task<Employee> FindAsync(string email)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

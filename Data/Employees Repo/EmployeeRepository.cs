@@ -40,5 +40,14 @@ namespace Data.Employees_Repo
         {
             return await _context.Employees.FindAsync(id);
         }
+        public async Task<Employee> GetByEmail(string email)
+        {
+            return await _context.Employees.FindAsync(email);
+        }
+
+        public async Task LoginAsync(string userName, string password)
+        {
+            return await _context.Employees.FirstOrDefault(x => (x.UserName == userName && x.Password == password));
+        }
     }
 }

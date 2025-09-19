@@ -14,5 +14,8 @@ namespace Application.Employee_Serv
         Task<EmployeeDto> GetById(int id);
         Task<List<EmployeeDto>> GetAllEmployees();
         Task<string> DeleteEmployee(int id);
+        Task<EmployeeDto> GetByIEmail (string email);
+        Task<EmployeeDto> RegisterAsync(CreateUpdateEmployeeDto dto);
+        Task<LoginResponseDto> LoginAsync(LoginDto dto);
     }
 }
