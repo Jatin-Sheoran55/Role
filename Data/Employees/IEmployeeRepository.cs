@@ -4,11 +4,16 @@ namespace Data.Employees;
 
 public interface IEmployeeRepository
 {
-    Task<Employee> CreateEmployee(Employee employee);
-    Task<Employee> GetById(int id);
-    Task<Employee> GetByEmail(string email);
-    Task<List<Employee>> GetAllEmployee();
-    Task DeleteEmployee(int id);
 
-    Task<Employee?> LoginAsync(string userNameOrEmail, string password);
+    Task<Employee> CreateEmployee(Employee employee);
+
+    Task<Employee?> GetByEmail(string email);
+
+    Task<Employee?> GetByIdAndPassword(int id, string password );
+
+    Task UpdateEmployee(Employee input);
+
+    Task<Employee?> LoginAsync(string email, string password);
+
+    Task<string> ResetPasswordCode(string emailId, int UserId, string ipAddress);
 }

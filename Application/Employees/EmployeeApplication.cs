@@ -1,4 +1,5 @@
-﻿using Application.Roles.DTO;
+﻿using Application.Employees.Dto;
+using Application.Roles.DTO;
 using AuthWebApp.Service.UserLogins.Dto;
 using Data.Employees;
 using Data.Roles;
@@ -10,97 +11,107 @@ public class EmployeeApplication : IEmployeeApplication
 {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IRoleRepository _roleRepository;
-
+     
     public EmployeeApplication(IEmployeeRepository employeeRepository,
-        IRoleRepository roleRepository)
+        IRoleRepository roleRepository
+         )
     {
         _employeeRepository = employeeRepository;
         _roleRepository = roleRepository;
+
+
     }
 
-    public async Task<EmployeeDto> CreateEmployee(CreateEmployeeDto input)
+    public async Task<int> CreateEmployee(CreateEmployeeDto input)
     {
-        var checkEmployee= await _employeeRepository.GetByEmail(input.Email);
+        var checkEmployee = await _employeeRepository.GetByEmail(input.Email);
 
-        if(checkEmployee != null)
+        if (checkEmployee != null)
         {
-            throw new Exception("Email Id already Exists");       
+            throw new Exception("Email Id already Exists");
         }
 
         var employee = new Employee();
         employee.Name = input.Name;
         employee.Email = input.Email;
-        employee.IsEnabled = true;
-        employee.PasswordHash = input.Password; 
+        employee.PasswordHash = input.Password;
+
         employee.CreatedDate = DateTime.Now;
-        employee.RoleId = 3;
+        employee.RoleId = 2;
 
-        var result = await _employeeRepository.CreateEmployee(employee);
-        
-        var employeeDto = new EmployeeDto();
-        
-        employeeDto.Id = result.Id;
+        var response = await _employeeRepository.CreateEmployee(employee);
 
-        return employeeDto;
-    }
-
-    public async Task<string> DeleteEmployee(int id)
-    {
-        await _employeeRepository.DeleteEmployee(id);
-        return "Deleted";
-    }
-
-    public async Task<List<EmployeeDto>> GetAllEmployees()
-    {
-        var data = await _employeeRepository.GetAllEmployee();
-        var employees = data.Select(x => new EmployeeDto()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Email = x.Email,
-            IsEnabled = x.IsEnabled,
-            PasswordHash = x.PasswordHash,
-            UpdatedDate = x.UpdatedDate,
-            CreatedDate = x.CreatedDate,
-        }).ToList();
-
-        return employees;
-    }
-
-    public async Task<EmployeeDto> GetById(int id)
-    {
-        var result = await _employeeRepository.GetById(id);
-        var data = new EmployeeDto()
-        {
-            Id = result.Id,
-            Name = result.Name,
-            Email = result.Email,
-            IsEnabled = result.IsEnabled,
-            PasswordHash = result.PasswordHash,
-            UpdatedDate = result.UpdatedDate,
-            CreatedDate = result.CreatedDate,
-
-        };
-        return data;
+        return response.Id;
     }
 
     public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
     {
-        var user = await _employeeRepository.LoginAsync(dto.UserNameOrEmail, dto.Password);
-       
+        var user = await _employeeRepository.LoginAsync(dto.Email, dto.Password);
+
         if (user == null)
+        {
             throw new Exception("Invalid username/email or password");
+        }
 
         var role = await _roleRepository.GetById(user.RoleId);
 
         return new LoginResponseDto
         {
             Id = user.Id,
-            UserName = user.Name,
+            Name = user.Name,
             Email = user.Email,
-            Role = role.Name ?? "User"
+            Role = role.Name
 
         };
     }
 
+    public async Task<bool> ChangePasswordAsync(int id, ChangePasswordDto dto)
+    {
+        var employee = await _employeeRepository.GetByIdAndPassword(id, dto.OldPassword);
+         
+
+        if (employee == null)
+        {
+            throw new Exception("Employee Not Found !");
+        }
+
+
+
+        employee.PasswordHash = dto.NewPassword;
+             
+
+        await _employeeRepository.UpdateEmployee(employee);
+
+        return true;
+       
+    }
+
+    public async Task<string> ForgetPasswordAsync(string emailId, string ipAddress)
+    {
+        var checkEmployee = await _employeeRepository.GetByEmail(emailId);
+
+        if (checkEmployee == null)
+        {
+            throw new Exception("Email Id not Exists");
+        }
+
+        var code = await _employeeRepository.ResetPasswordCode(emailId, checkEmployee.Id, ipAddress);
+            
+        return code;
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

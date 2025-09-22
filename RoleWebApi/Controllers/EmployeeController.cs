@@ -1,12 +1,16 @@
-﻿using Application.Employees;
+﻿using Application.Employees.Dto;
 using Application.Roles.DTO;
 using AuthWebApp.Service.UserLogins.Dto;
+using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using RoleWebApi.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RoleWebApi.Controllers;
 
@@ -16,12 +20,16 @@ public class EmployeeController : ControllerBase
 {
     private readonly IEmployeeApplication _employee;
     private readonly IConfiguration _configuration;
-
-    public EmployeeController(IEmployeeApplication employee, IConfiguration configuration)
+    private readonly IEmailService _emailService;
+     
+    public EmployeeController(IEmployeeApplication employee, 
+        IConfiguration configuration,
+        IEmailService emailService)
     {
         _employee = employee;
         _configuration = configuration;
-    }
+        _emailService = emailService;
+     }
 
     [HttpPost]
     public async Task<IActionResult> Post(CreateEmployeeDto input)
@@ -29,13 +37,13 @@ public class EmployeeController : ControllerBase
         try
         {
 
-            var data = await _employee.CreateEmployee(input);
-            return Ok( data.Id);
+            var id = await _employee.CreateEmployee(input);
+            return Ok(id);
 
-        } 
-        catch( Exception ex)
+        }
+        catch (Exception ex)
         {
-          return  BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
@@ -53,8 +61,7 @@ public class EmployeeController : ControllerBase
             var claims = new[]
             {
                     new  Claim(JwtRegisteredClaimNames.Sub , response.Id.ToString() ),
-                    new  Claim(ClaimTypes.Role, response.Role),
-                   // new  Claim(JwtRegisteredClaimNames.Jti ,"2232323232"),
+                    new  Claim(ClaimTypes.Role, response.Role), 
                     new Claim("other","other")
                  };
 
@@ -67,6 +74,9 @@ public class EmployeeController : ControllerBase
       );
 
             response.Token = new JwtSecurityTokenHandler().WriteToken(token);
+
+
+
             return Ok(new { message = "Login successful", data = response });
         }
         catch (Exception ex)
@@ -76,30 +86,96 @@ public class EmployeeController : ControllerBase
 
     }
 
-    [HttpGet]
-    public async Task<List<EmployeeDto>> GetAll()
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto input)
     {
-        return await _employee.GetAllEmployees();
-    }
-    [HttpGet("{id}")]
 
-    public async Task<EmployeeDto> Get(int id)
+        try
+        { 
+
+            var user = HttpContext.User;
+
+            var userid = user.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? user.FindFirstValue("Sub");
+                 
+            await _employee.ChangePasswordAsync(Convert.ToInt32( userid),input);
+
+            return Ok("Passsword Changed ");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+    }
+
+
+    [HttpGet("forget-password/{emailId}")]
+    public async Task<IActionResult> ForgetPassword(string emailId)
     {
-        return await _employee.GetById(id);
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+            var code = await _employee.ForgetPasswordAsync(emailId, ipAddress);
+             
+            await SendResetPasswordEmail(emailId, code);
+            
+            return Ok("reset password link sended to your EmailId");
+
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+
     }
 
-    [HttpPut("{id}")]
-    public async Task Put(int id, CreateEmployeeDto input)
+
+
+    [HttpGet("reset-password/{code}")]
+    public async Task<IActionResult> ResetPassword(string code)
     {
-        await _employee.GetById(id);
-    }
+        try
+        { 
+            return Ok("code is "+code );
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
-    [HttpDelete("{id}")]
-    public async Task Delete(int id)
+
+    }
+    private async Task SendResetPasswordEmail(string email, string code)
     {
-        await _employee.DeleteEmployee(id);
-    }
+        var subject = "Reset Your Password - Your Website";
 
+        // Suppose your website reset URL
+        var resetUrl = $"https://localhost:7012/employee/reset-password/{code}";
+
+
+        var body = $@"
+    <html>
+    <body style='font-family: Arial, sans-serif; font-size: 14px; color: #333;'>
+        <p>Hi,</p>
+        <p>We received a request to reset your password.</p>
+        <p>
+            Please click the link below to reset your password:
+        </p>
+        <p>
+            <a href='{resetUrl}' style='background-color: #007bff; color: #fff; padding: 8px 12px; text-decoration: none; border-radius: 4px;'>Reset Password</a>
+        </p>
+        <p>If you did not request a password reset, you can safely ignore this email or consider changing your password for security purposes.</p>
+        <p>Thank you,<br/>Your Website Team</p>
+    </body>
+    </html>";
+
+      await   _emailService.SendEmailAsync(email, subject, body);
+    }
 
 
 }
+

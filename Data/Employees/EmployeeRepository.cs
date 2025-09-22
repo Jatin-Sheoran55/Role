@@ -1,10 +1,10 @@
 ﻿using Domain;
 using Microsoft.EntityFrameworkCore;
+using YourAppNamespace.Models;
 
 namespace Data.Employees;
 
 public class EmployeeRepository : IEmployeeRepository
-
 {
     private readonly ProjectContext _context;
 
@@ -20,31 +20,42 @@ public class EmployeeRepository : IEmployeeRepository
         return employee;
     }
 
-    public async Task DeleteEmployee(int id)
+    public async Task UpdateEmployee(Employee input)
     {
-        var employee = await _context.Employees.FindAsync(id);
-        _context.Employees.Remove(employee);
+        _context.Employees.Update(input);
+        await _context.SaveChangesAsync();
+    }
+    public async Task<Employee?> GetByEmail(string email)
+    {
+
+        return await _context.Employees
+            .FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<List<Employee>> GetAllEmployee()
-    {
-        return await _context.Employees.ToListAsync();
-    }
 
-    public async Task<Employee> GetById(int id)
-    {
-        return await _context.Employees.FindAsync(id);
-    }
-    public async Task<Employee> GetByEmail(string  email)
-    {
-        return await _context.Employees.FirstOrDefaultAsync(x => x.Email == email);
-    }
-    public async Task<Employee?> LoginAsync(string userNameOrEmail, string password)
+    public async Task<Employee?> LoginAsync(string email, string password)
     {
         return await _context.Employees
-            .FirstOrDefaultAsync(x => (x.Email == userNameOrEmail)
+            .FirstOrDefaultAsync(x => x.Email == email
         && x.PasswordHash == password);
 
     }
 
+    public async Task<Employee?>  GetByIdAndPassword(int id, string password)
+    {
+        return await _context.Employees
+         .FirstOrDefaultAsync(x => x.Id == id && x.PasswordHash == password);
+
+    }
+
+    public async Task<string>  ResetPasswordCode(string emailId, int userId, string ipAddress)
+    {
+        var resetCode = new ResetPasswordCode(userId, emailId, ipAddress);
+        
+        _context.ResetPasswordCodes.Add(resetCode);
+        await _context.SaveChangesAsync();
+
+        return resetCode.Code;
+    }
 }
+
