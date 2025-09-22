@@ -50,7 +50,9 @@ public class EmployeeApplication : IEmployeeApplication
         var user = await _employeeRepository.LoginAsync(dto.Email, dto.Password);
 
         if (user == null)
+        {
             throw new Exception("Invalid username/email or password");
+        }
 
         var role = await _roleRepository.GetById(user.RoleId);
 
@@ -85,6 +87,20 @@ public class EmployeeApplication : IEmployeeApplication
        
     }
 
+    public async Task<string> ForgetPasswordAsync(string emailId, string ipAddress)
+    {
+        var checkEmployee = await _employeeRepository.GetByEmail(emailId);
+
+        if (checkEmployee == null)
+        {
+            throw new Exception("Email Id not Exists");
+        }
+
+        var code = await _employeeRepository.ResetPasswordCode(emailId, checkEmployee.Id, ipAddress);
+            
+        return code;
+
+    }
 }
 
 

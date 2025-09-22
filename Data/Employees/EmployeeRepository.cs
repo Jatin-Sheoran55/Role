@@ -1,5 +1,6 @@
 ﻿using Domain;
 using Microsoft.EntityFrameworkCore;
+using YourAppNamespace.Models;
 
 namespace Data.Employees;
 
@@ -47,6 +48,14 @@ public class EmployeeRepository : IEmployeeRepository
 
     }
 
+    public async Task<string>  ResetPasswordCode(string emailId, int userId, string ipAddress)
+    {
+        var resetCode = new ResetPasswordCode(userId, emailId, ipAddress);
+        
+        _context.ResetPasswordCodes.Add(resetCode);
+        await _context.SaveChangesAsync();
 
+        return resetCode.Code;
+    }
 }
 

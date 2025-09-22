@@ -10,4 +10,7 @@ public interface IEmployeeApplication
 
     Task<bool> ChangePasswordAsync(int id ,ChangePasswordDto dto);
 
+    Task<string> ForgetPasswordAsync(string emailId, string ipAddress);
+
+
 }
