@@ -33,7 +33,7 @@ public class EmployeeApplication : IEmployeeApplication
         employee.IsEnabled = true;
         employee.PasswordHash = input.Password; 
         employee.CreatedDate = DateTime.Now;
-        employee.RoleId = 2;
+        employee.RoleId = 3;
 
         var result = await _employeeRepository.CreateEmployee(employee);
         
