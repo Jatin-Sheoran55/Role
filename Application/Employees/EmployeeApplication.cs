@@ -4,6 +4,7 @@ using AuthWebApp.Service.UserLogins.Dto;
 using Data.Employees;
 using Data.Roles;
 using Domain;
+using YourAppNamespace.Models;
 
 namespace Application.Employees;
 
@@ -99,6 +100,33 @@ public class EmployeeApplication : IEmployeeApplication
         var code = await _employeeRepository.ResetPasswordCode(emailId, checkEmployee.Id, ipAddress);
             
         return code;
+
+    }
+
+     public async Task  ResetPassword(ResetPasswordDto input)
+    {
+        var result =  await _employeeRepository.ValidateResetPasswordCode(input.Code);
+
+        if (result == null)
+        {
+            throw new Exception(" code is not valid");
+        }
+
+        var employee =  await _employeeRepository.GetById(result.UserId);
+
+        if(employee == null) 
+            {
+            throw new Exception("Employee not found");
+            }
+
+           employee.PasswordHash = input.Password;
+
+        await _employeeRepository.UpdateEmployee(employee);
+
+
+         result.Status = ResetPasswordStatus.Used;
+
+        await _employeeRepository.UpdateResetPasswordCode(result);
 
     }
 }

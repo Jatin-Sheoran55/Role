@@ -12,5 +12,6 @@ public interface IEmployeeApplication
 
     Task<string> ForgetPasswordAsync(string emailId, string ipAddress);
 
+    Task ResetPassword(ResetPasswordDto input );
 
 }

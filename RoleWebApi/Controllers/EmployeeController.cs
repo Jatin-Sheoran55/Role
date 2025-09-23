@@ -135,12 +135,14 @@ public class EmployeeController : ControllerBase
 
 
 
-    [HttpGet("reset-password/{code}")]
-    public async Task<IActionResult> ResetPassword(string code)
+    [HttpPut("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto input)
     {
         try
         { 
-            return Ok("code is "+code );
+            await _employee.ResetPassword(input);
+            return Ok("reset successfully!");
+
         }
         catch (Exception ex)
         {

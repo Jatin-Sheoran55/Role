@@ -33,6 +33,12 @@ public class EmployeeRepository : IEmployeeRepository
     }
 
 
+    public async Task<Employee?> GetById(int id)
+    {
+
+        return await _context.Employees.FindAsync(id);
+    }
+
     public async Task<Employee?> LoginAsync(string email, string password)
     {
         return await _context.Employees
@@ -56,6 +62,22 @@ public class EmployeeRepository : IEmployeeRepository
         await _context.SaveChangesAsync();
 
         return resetCode.Code;
+    }
+
+     public async Task<ResetPasswordCode?>  ValidateResetPasswordCode(string code)
+    {
+      
+       return await  _context.ResetPasswordCodes
+            .FirstOrDefaultAsync(x => x.Code == code 
+            && x.ValidDate >=DateTime.UtcNow
+            && x.Status == ResetPasswordStatus.Created);
+    }
+
+     public async Task  UpdateResetPasswordCode(ResetPasswordCode input)
+    {
+        _context.ResetPasswordCodes.Update(input);
+
+        await _context.SaveChangesAsync();
     }
 }
 
