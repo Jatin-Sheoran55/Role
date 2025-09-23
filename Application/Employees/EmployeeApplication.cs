@@ -39,7 +39,6 @@ public class EmployeeApplication : IEmployeeApplication
 
         employee.CreatedDate = DateTime.Now;
         employee.RoleId = 2;
-        employee.IsEnabled = true;
 
         var response = await _employeeRepository.CreateEmployee(employee);
 
